@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Password</title>
+    <style>
+        body {
+            background-color: #4a0e17; /* Granate oscuro para el fondo */
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            padding: 50px 20px;
+        }
+
+        .contenedor {
+            background-color: #800020; /* Granate principal */
+            max-width: 360px;
+            margin: 0 auto;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #ffffff; /* Borde blanco sencillo */
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .caja-res {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .caja-res input {
+            flex: 1;
+            padding: 8px;
+            font-size: 15px;
+            background-color: #4a0e17; /* Segundo tono de granate para los campos */
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .caja-res button {
+            padding: 8px 12px;
+            background-color: #ffffff;
+            color: #800020;
+            border: 1px solid #ffffff;
+            border-radius: 0 4px 4px 0;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .fila {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .fila input[type="number"] {
+            width: 45px;
+            padding: 3px;
+            background-color: #4a0e17;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .btn-gen {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #ffffff;
+            color: #800020;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-gen:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="contenedor">
+    <h2>Generador de Password</h2>
+
+    <div class="caja-res">
+        <input type="text" id="txtPass" readonly placeholder="Click en generar...">
+        <button onclick="copiarClave()">Copiar</button>
+    </div>
+
+    <div class="fila">
+        <label>Tamaño de la contraseña</label>
+        <input type="number" id="numLargo" value="15" min="4" max="40">
+    </div>
+
+    <div class="fila">
+        <label>Se incluyen letras mayusculas</label>
+        <input type="checkbox" id="chkMayus">
+    </div>
+
+    <div class="fila">
+        <label>Se incluye letras minúsculas</label>
+        <input type="checkbox" id="chkMinus" checked>
+    </div>
+
+    <div class="fila">
+        <label>Se incluye numeros</label>
+        <input type="checkbox" id="chkNum" checked>
+    </div>
+
+    <div class="fila">
+        <label>Se incluye simbolos</label>
+        <input type="checkbox" id="chkSim">
+    </div>
+
+    <button class="btn-gen" onclick="generarClave()">Generate Password</button>
+</div>
+
+<script>
+    function generarClave() {
+        var mayus = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var minus = "abcdefghijklmnopqrstuvwxyz";
+        var numeros = "0123456789";
+        var simbolos = "!@#$%^&*()_+-=";
+
+        var letrasPermitidas = "";
+
+        if (document.getElementById("chkMayus").checked) {
+            letrasPermitidas = letrasPermitidas + mayus;
+        }
+        if (document.getElementById("chkMinus").checked) {
+            letrasPermitidas = letrasPermitidas + minus;
+        }
+        if (document.getElementById("chkNum").checked) {
+            letrasPermitidas = letrasPermitidas + numeros;
+        }
+        if (document.getElementById("chkSim").checked) {
+            letrasPermitidas = letrasPermitidas + simbolos;
+        }
+
+        if (letrasPermitidas == "") {
+            alert("Debes seleccionar al menos una opcion");
+            return;
+        }
+
+        var tamano = document.getElementById("numLargo").value;
+        var resultado = "";
+
+        for (var i = 0; i < tamano; i++) {
+            var aleatorio = Math.floor(Math.random() * letrasPermitidas.length);
+            resultado = resultado + letrasPermitidas[aleatorio];
+        }
+
+        document.getElementById("txtPass").value = resultado;
+    }
+
+    function copiarClave() {
+        var inputClave = document.getElementById("txtPass");
+        if (inputClave.value != "") {
+            navigator.clipboard.writeText(inputClave.value);
+            alert("Contraseña copiada");
+        }
+    }
+</script>
+
+</body>
+</html>
