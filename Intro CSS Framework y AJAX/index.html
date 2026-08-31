@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galeria de Gatos - AJAX</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <header>
+    <h1>Galeria de Gatos</h1>
+    <p>Tecnologias Emergentes - FIUNI</p>
+  </header>
+
+  <main>
+
+    <!-- controles -->
+    <div class="controles">
+      <label for="cantidad">Cantidad:</label>
+      <select id="cantidad">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+      </select>
+
+      <button id="btnCargar">Cargar Gatos</button>
+    </div>
+
+    <!-- mensajes de estado -->
+    <p id="mensaje" class="mensaje">Toca el boton para traer los gatos.</p>
+
+    <!-- aca se van a mostrar las imagenes -->
+    <div id="galeria" class="galeria"></div>
+
+  </main>
+
+  <footer>
+    <p>API usada: api.thecatapi.com</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
