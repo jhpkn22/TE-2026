@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noticias - Tailwind</title>
+
+  <!-- CDN de tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<!-- navbar, aca hay que armarlo con flex porque tailwind no trae navbar -->
+<nav class="bg-gray-800 p-4">
+  <div class="max-w-5xl mx-auto flex justify-between items-center">
+    <a href="index.html" class="text-white text-xl font-bold">Noticias</a>
+    <div class="flex gap-4">
+      <a href="bootstrap.html" class="text-gray-300 hover:text-white">Bootstrap</a>
+      <a href="tailwind.html" class="text-white">Tailwind</a>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-5xl mx-auto p-4 mt-4">
+
+  <h2 class="text-2xl font-bold">Ultimas noticias</h2>
+  <p class="text-gray-500 mb-4">Version hecha con Tailwind CSS</p>
+
+  <!-- filtros -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <input type="text" id="buscador" placeholder="Buscar noticia..."
+           class="md:col-span-2 w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500">
+    <select id="filtroAutor" class="w-full border border-gray-300 p-2 rounded">
+      <option value="">Todos los autores</option>
+    </select>
+  </div>
+
+  <!-- mientras carga -->
+  <div id="cargando" class="text-center my-10">
+    <div class="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
+    <p class="mt-2 text-gray-500">Cargando...</p>
+  </div>
+
+  <!-- si falla el fetch -->
+  <div id="error" class="hidden bg-red-100 border border-red-400 text-red-700 p-3 rounded">
+    Hubo un error al traer los datos de la API.
+  </div>
+
+  <!-- aca se cargan las noticias -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="contenedor"></div>
+
+</div>
+
+<footer class="bg-gray-800 text-white text-center py-4 mt-10">
+  <p class="text-sm">Tecnologias Emergentes - FIUNI 2025</p>
+</footer>
+
+<!-- modal, en tailwind hay que hacerlo a mano -->
+<div id="modalNoticia" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+  <div class="bg-white rounded-lg max-w-2xl w-full">
+    <div class="flex justify-between items-center border-b p-4">
+      <h5 class="font-bold" id="tituloModal"></h5>
+      <button onclick="cerrarModal()" class="text-gray-500 hover:text-black text-xl">X</button>
+    </div>
+    <div class="p-4">
+      <p class="text-gray-500 text-sm mb-2" id="autorModal"></p>
+      <p id="cuerpoModal"></p>
+    </div>
+    <div class="border-t p-4 text-right">
+      <button onclick="cerrarModal()" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var url = "https://jsonplaceholder.typicode.com";
+  var noticias = [];
+  var usuarios = [];
+
+  fetch(url + "/users")
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      usuarios = data;
+      cargarSelect();
+      return fetch(url + "/posts");
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      noticias = data.slice(0, 12);
+      document.getElementById("cargando").style.display = "none";
+      mostrar(noticias);
+    })
+    .catch(function (err) {
+      console.log(err);
+      document.getElementById("cargando").style.display = "none";
+      document.getElementById("error").classList.remove("hidden");
+    });
+
+  function buscarAutor(id) {
+    for (var i = 0; i < usuarios.length; i++) {
+      if (usuarios[i].id == id) {
+        return usuarios[i].name;
+      }
+    }
+    return "Sin autor";
+  }
+
+  function cargarSelect() {
+    var select = document.getElementById("filtroAutor");
+    for (var i = 0; i < usuarios.length; i++) {
+      select.innerHTML += "<option value='" + usuarios[i].id + "'>" + usuarios[i].name + "</option>";
+    }
+  }
+
+  function mostrar(lista) {
+    var html = "";
+
+    if (lista.length == 0) {
+      html = "<p class='text-gray-500'>No se encontro ninguna noticia.</p>";
+    }
+
+    for (var i = 0; i < lista.length; i++) {
+      var n = lista[i];
+      html += "<div class='bg-white rounded-lg shadow p-6'>" +
+                "<span class='bg-blue-500 text-white text-xs px-2 py-1 rounded'>" + buscarAutor(n.userId) + "</span>" +
+                "<h3 class='font-bold text-lg mt-3 mb-2'>" + n.title + "</h3>" +
+                "<p class='text-gray-600 text-sm mb-4'>" + n.body.substring(0, 90) + "...</p>" +
+                "<button onclick='verNoticia(" + n.id + ")' class='border border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white text-sm py-1 px-3 rounded'>Ver mas</button>" +
+              "</div>";
+    }
+
+    document.getElementById("contenedor").innerHTML = html;
+  }
+
+  function verNoticia(id) {
+    var noticia = noticias.find(function (n) { return n.id == id; });
+
+    document.getElementById("tituloModal").innerText = noticia.title;
+    document.getElementById("autorModal").innerText = "Autor: " + buscarAutor(noticia.userId);
+    document.getElementById("cuerpoModal").innerText = noticia.body;
+
+    document.getElementById("modalNoticia").classList.remove("hidden");
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalNoticia").classList.add("hidden");
+  }
+
+  function filtrar() {
+    var texto = document.getElementById("buscador").value.toLowerCase();
+    var autor = document.getElementById("filtroAutor").value;
+
+    var resultado = noticias.filter(function (n) {
+      var coincide = n.title.toLowerCase().indexOf(texto) != -1;
+      if (autor != "") {
+        return coincide && n.userId == autor;
+      }
+      return coincide;
+    });
+
+    mostrar(resultado);
+  }
+
+  document.getElementById("buscador").onkeyup = filtrar;
+  document.getElementById("filtroAutor").onchange = filtrar;
+</script>
+
+</body>
+</html>
