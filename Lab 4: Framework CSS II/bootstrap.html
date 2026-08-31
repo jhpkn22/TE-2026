@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noticias - Bootstrap</title>
+
+  <!-- CDN de bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Noticias</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="bootstrap.html">Bootstrap</a></li>
+        <li class="nav-item"><a class="nav-link" href="tailwind.html">Tailwind</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+
+  <h2>Ultimas noticias</h2>
+  <p class="text-muted">Version hecha con Bootstrap 5</p>
+
+  <!-- filtros -->
+  <div class="row mb-4">
+    <div class="col-md-8 mb-2">
+      <input type="text" id="buscador" class="form-control" placeholder="Buscar noticia...">
+    </div>
+    <div class="col-md-4 mb-2">
+      <select id="filtroAutor" class="form-select">
+        <option value="">Todos los autores</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- mientras carga -->
+  <div id="cargando" class="text-center my-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2">Cargando...</p>
+  </div>
+
+  <!-- si falla el fetch -->
+  <div id="error" class="alert alert-danger d-none">
+    Hubo un error al traer los datos de la API.
+  </div>
+
+  <!-- aca se cargan las noticias -->
+  <div class="row" id="contenedor"></div>
+
+</div>
+
+<footer class="bg-dark text-white text-center py-3 mt-5">
+  <small>Tecnologias Emergentes - FIUNI 2025</small>
+</footer>
+
+<!-- modal para ver la noticia completa -->
+<div class="modal fade" id="modalNoticia" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tituloModal"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" id="autorModal"></p>
+        <p id="cuerpoModal"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- el js de bootstrap, sino no anda el modal ni el navbar -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  var url = "https://jsonplaceholder.typicode.com";
+  var noticias = [];
+  var usuarios = [];
+
+  // traigo los usuarios primero asi puedo poner el nombre del autor en la tarjeta
+  fetch(url + "/users")
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      usuarios = data;
+      cargarSelect();
+      return fetch(url + "/posts");
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      noticias = data.slice(0, 12); // con 12 alcanza
+      document.getElementById("cargando").style.display = "none";
+      mostrar(noticias);
+    })
+    .catch(function (err) {
+      console.log(err);
+      document.getElementById("cargando").style.display = "none";
+      document.getElementById("error").classList.remove("d-none");
+    });
+
+  function buscarAutor(id) {
+    for (var i = 0; i < usuarios.length; i++) {
+      if (usuarios[i].id == id) {
+        return usuarios[i].name;
+      }
+    }
+    return "Sin autor";
+  }
+
+  function cargarSelect() {
+    var select = document.getElementById("filtroAutor");
+    for (var i = 0; i < usuarios.length; i++) {
+      select.innerHTML += "<option value='" + usuarios[i].id + "'>" + usuarios[i].name + "</option>";
+    }
+  }
+
+  function mostrar(lista) {
+    var html = "";
+
+    if (lista.length == 0) {
+      html = "<p class='text-muted'>No se encontro ninguna noticia.</p>";
+    }
+
+    for (var i = 0; i < lista.length; i++) {
+      var n = lista[i];
+      html += "<div class='col-12 col-md-6 col-lg-4 mb-4'>" +
+                "<div class='card h-100'>" +
+                  "<div class='card-body'>" +
+                    "<span class='badge bg-primary mb-2'>" + buscarAutor(n.userId) + "</span>" +
+                    "<h5 class='card-title'>" + n.title + "</h5>" +
+                    "<p class='card-text'>" + n.body.substring(0, 90) + "...</p>" +
+                    "<button class='btn btn-outline-primary btn-sm' onclick='verNoticia(" + n.id + ")'>Ver mas</button>" +
+                  "</div>" +
+                "</div>" +
+              "</div>";
+    }
+
+    document.getElementById("contenedor").innerHTML = html;
+  }
+
+  function verNoticia(id) {
+    var noticia = noticias.find(function (n) { return n.id == id; });
+
+    document.getElementById("tituloModal").innerText = noticia.title;
+    document.getElementById("autorModal").innerText = "Autor: " + buscarAutor(noticia.userId);
+    document.getElementById("cuerpoModal").innerText = noticia.body;
+
+    var modal = new bootstrap.Modal(document.getElementById("modalNoticia"));
+    modal.show();
+  }
+
+  // filtros
+  function filtrar() {
+    var texto = document.getElementById("buscador").value.toLowerCase();
+    var autor = document.getElementById("filtroAutor").value;
+
+    var resultado = noticias.filter(function (n) {
+      var coincide = n.title.toLowerCase().indexOf(texto) != -1;
+      if (autor != "") {
+        return coincide && n.userId == autor;
+      }
+      return coincide;
+    });
+
+    mostrar(resultado);
+  }
+
+  document.getElementById("buscador").onkeyup = filtrar;
+  document.getElementById("filtroAutor").onchange = filtrar;
+</script>
+
+</body>
+</html>
