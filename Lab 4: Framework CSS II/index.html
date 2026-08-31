@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tarea - Bootstrap y Tailwind</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container mt-5">
+    <h1>Mini App de Noticias</h1>
+    <p>Tecnologias Emergentes - FIUNI - Quinto semestre</p>
+    <p>La misma app hecha dos veces, una con Bootstrap y otra con Tailwind, para comparar.</p>
+
+    <div class="row mt-4">
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Version con Bootstrap</h5>
+            <p class="card-text">Usa la grilla de 12 columnas y los componentes que ya vienen (card, modal, navbar).</p>
+            <a href="bootstrap.html" class="btn btn-primary">Abrir</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Version con Tailwind</h5>
+            <p class="card-text">Todo armado con clases de utilidad, el modal esta hecho a mano con JS.</p>
+            <a href="tailwind.html" class="btn btn-dark">Abrir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-muted mt-3">Los datos salen de jsonplaceholder.typicode.com</p>
+  </div>
+
+</body>
+</html>
